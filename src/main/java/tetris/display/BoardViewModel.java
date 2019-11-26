@@ -1,34 +1,30 @@
 package tetris.display;
 
-import tetris.block.TetrisBlock;
-import tetris.block.Tile;
 import tetris.board.TetrisBoard;
 import tetris.game.Action;
+import tetris.game.TetrisGame;
 
 public class BoardViewModel {
 
-    private TetrisBoard board;
+    private TetrisGame game;
     private int ticks;
 
-    public BoardViewModel() {
-        board = new TetrisBoard();
+    public BoardViewModel(TetrisGame game) {
+        this.game = game;
         ticks = 1;
     }
 
     public TetrisBoard getBoard() {
-        return board;
+        return game.getBoard();
     }
 
     public void tick() {
-        if (board.tickBlock(ticks)) {
-            board.setPiece(new TetrisBlock(Tile.getRandom()));
-        }
-
-        this.ticks++;
+        game.tick(this.ticks++);
     }
 
 
     public void move(String action) {
+        TetrisBoard board = game.getBoard();
 
         switch(action.toUpperCase()) {
             case "A":

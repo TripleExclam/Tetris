@@ -12,9 +12,12 @@ import tetris.board.TetrisBoard;
 
 public class BoardView {
 
-    private static final int CANVAS_HEIGHT = 600;
-    private static final int BLOCK_SIZE = CANVAS_HEIGHT / TetrisBoard.getHeight();
-    private static final int CANVAS_WIDTH = BLOCK_SIZE * TetrisBoard.getWidth();
+    private static final String EDGE_COLOUR = "#f71616";
+    public static final String BACKGROUND_COLOUR = "#00033D";
+
+    private static final int HEIGHT = 600;
+    private static final int BLOCK_SIZE = HEIGHT / TetrisBoard.getHeight();
+    private static final int WIDTH = BLOCK_SIZE * TetrisBoard.getWidth();
 
     private BoardViewModel viewModel;
     private Pane mainPane;
@@ -30,7 +33,7 @@ public class BoardView {
         this.viewModel = viewModel;
 
         mainPane = new GridPane();
-        playArea = new Canvas(CANVAS_WIDTH, CANVAS_HEIGHT);
+        playArea = new Canvas(WIDTH, HEIGHT);
 
         mainPane.getChildren().addAll(playArea);
     }
@@ -53,15 +56,15 @@ public class BoardView {
 
         drawCanvas(context);
         drawBoard(context);
-        drawPiece(context);
+        drawPiece(context, viewModel.getBoard().getPiece());
     }
 
     /*
      * Draws the background fill on the given context.
      */
-    private void drawCanvas(GraphicsContext gc) {
-        gc.setFill(Color.web("#00033D"));
-        gc.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+    public static void drawCanvas(GraphicsContext gc) {
+        gc.setFill(Color.web(BACKGROUND_COLOUR));
+        gc.fillRect(0, 0, WIDTH, HEIGHT);
     }
 
     /*
@@ -78,9 +81,7 @@ public class BoardView {
         }
     }
 
-    private void drawPiece(GraphicsContext gc) {
-        TetrisBlock piece = viewModel.getBoard().getPiece();
-
+    public static void drawPiece(GraphicsContext gc, TetrisBlock piece) {
         if (piece == null) {
             return;
         }
@@ -95,14 +96,17 @@ public class BoardView {
 
     }
 
-    private void drawCell(GraphicsContext gc, int x, int y, String colour) {
+    private static void drawCell(GraphicsContext gc, int x, int y, String colour) {
         int xCoord = x * BLOCK_SIZE;
         int yCoord = y * BLOCK_SIZE;
 
         gc.setFill(Color.web(colour));
-        gc.setStroke(Color.web("#f71616"));
+        gc.setStroke(Color.web(EDGE_COLOUR));
         gc.fillRect(xCoord, yCoord, BLOCK_SIZE, BLOCK_SIZE);
         gc.strokeRect(xCoord, yCoord, BLOCK_SIZE, BLOCK_SIZE);
     }
 
+    public static int getBlockSize() {
+        return BLOCK_SIZE;
+    }
 }

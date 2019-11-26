@@ -7,22 +7,33 @@ import tetris.util.Matrix;
 
 public class TetrisBoard {
     // Dimensional constants
-    private static final int HEIGHT = 30;
-    private static final int WIDTH = 24;
-    private static final int INIT_SPEED = 50;
+    private static final int HEIGHT = 20;
+    private static final int WIDTH = 12;
 
+    private int speedValue = 50;
     private Matrix board;
-    private TetrisBlock piece;
+    private TetrisBlock currentPiece;
+    private TetrisBlock nextPiece;
     private boolean speed;
 
     public TetrisBoard() {
         board = new Matrix(WIDTH, HEIGHT, Tile.EMP);
-        piece = new TetrisBlock(Tile.RIT);
+        currentPiece = new TetrisBlock(Tile.getRandom());
+        nextPiece = new TetrisBlock(Tile.getRandom());
         speed = false;
     }
 
+    public TetrisBlock getNextPiece() {
+        TetrisBlock block = nextPiece.copy();
+
+        block.setxCoord(1);
+        block.setyCoord(1);
+
+        return block;
+    }
+
     public TetrisBlock getPiece() {
-        return piece;
+        return currentPiece;
     }
 
     public Matrix getBoard() {
@@ -30,7 +41,8 @@ public class TetrisBoard {
     }
 
     public void setPiece(TetrisBlock block) {
-        piece = block.copy();
+        currentPiece = nextPiece;
+        nextPiece = block;
     }
 
     /**
@@ -39,7 +51,7 @@ public class TetrisBoard {
      * @return Whether a new block is required
      */
     public boolean tickBlock(int tick) {
-        if (tick % ((speed) ? INIT_SPEED / 5 : INIT_SPEED) != 0) {
+        if (tick % ((speed) ? speedValue / 5 : speedValue) != 0) {
             return false;
         }
 
@@ -47,14 +59,18 @@ public class TetrisBoard {
             return false;
         }
 
-        board.setPiece(piece.getTile(), piece.getyCoord(), piece.getxCoord());
+        board.setPiece(currentPiece.getTile(), currentPiece.getyCoord(), currentPiece.getxCoord());
         return true;
     }
 
+    public void increaseLevel() {
+        speedValue -= 5;
+    }
+
     private boolean executeMoveDown() {
-        if (board.checkIntersect(piece.getTile(), piece.getyCoord() + 1,
-                piece.getxCoord()) && getPiece().getHighestY() < getHeight() - 1) {
-            piece.setyCoord(piece.getyCoord() + 1);
+        if (board.checkIntersect(currentPiece.getTile(), currentPiece.getyCoord() + 1,
+                currentPiece.getxCoord()) && getPiece().getHighestY() < getHeight() - 1) {
+            currentPiece.setyCoord(currentPiece.getyCoord() + 1);
             return true;
         }
 
@@ -62,7 +78,8 @@ public class TetrisBoard {
     }
 
     private boolean canMove() {
-        if (getPiece().getLeftMostX() < 0 || getPiece().getRightMostX() >= getWidth()) {
+        if (getPiece().getLeftMostX() < 0 || getPiece().getRightMostX() >= getWidth()
+                || getPiece().getHighestY() >= getHeight()) {
             return false;
         }
         return true;
@@ -89,13 +106,27 @@ public class TetrisBoard {
                 speed = false; // When down is released
                 break;
         }
-        if (!canMove()) {
-            move(move.getOpposite());
-        }
-        if (!board.checkIntersect(piece.getTile(), piece.getyCoord(), piece.getxCoord())) {
+
+        if (!canMove() || !board.checkIntersect(currentPiece.getTile(), currentPiece.getyCoord(), currentPiece.getxCoord())) {
             move(move.getOpposite());
         }
 
+    }
+
+    public int clearLines() {
+        int row = getHeight() - 1;
+        int cleared = 0;
+        int rowCount;
+
+        while ((rowCount = board.getRowCount(row)) != 0) {
+            if (rowCount == getWidth()) {
+                cleared++;
+                board.collapseRow(row++);
+            }
+            row--;
+        }
+
+        return cleared;
     }
 
     public static int getHeight() {

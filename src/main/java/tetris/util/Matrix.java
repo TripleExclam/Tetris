@@ -51,6 +51,29 @@ public class Matrix{
         }
     }
 
+    public int getRowCount(int row) {
+        if (row >= getHeight() || row < 0) {
+            return 0;
+        }
+        int rowCount = 0;
+
+        for (int i = 0; i < getWidth(); i++) {
+            if (!get(row, i).equals(Tile.EMP)) {
+                rowCount++;
+            }
+        }
+
+        return rowCount;
+    }
+
+    public void collapseRow(int row) {
+        for (int i = row; i > 0; i--) {
+            for (int j = 0; j < getWidth(); j++) {
+                set(i, j, get(i - 1, j));
+            }
+        }
+    }
+
     public int getWidth() {
         return (getHeight() > 0 ) ? matrix[0].length : 0;
     }

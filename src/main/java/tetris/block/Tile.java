@@ -9,8 +9,10 @@ public enum Tile {
     LEF("#0000dc", (1 << 18) | (1 << 17) | (1 << 12) | (1 << 7)),
     RIT("#f0a000", (1 << 17) | (1 << 16) | (1 << 12) | (1 << 7)),
     ZIG("#00f000", (1 << 18) | (1 << 17) | (1 << 12) | (1 << 11)),
-    ZAG("#eb0000", (1 << 17) | (1 << 16) | (1 << 13) | (1 << 12));
+    ZAG("#eb0000", (1 << 17) | (1 << 16) | (1 << 13) | (1 << 12)),
+    BOK("#f0f000", (1 << 12) | (1 << 11) | (1 << 17) | (1 << 16));
 
+    private static final Random RANDOM = new Random();
     private final String colour;
     private final int encoding;
 
@@ -28,6 +30,6 @@ public enum Tile {
     }
 
     public static Tile getRandom() {
-        return Tile.values()[new Random().nextInt(Tile.values().length - 1) + 1];
+        return Tile.values()[RANDOM.nextInt(Tile.values().length - 1) + 1];
     }
 }

@@ -5,7 +5,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
-import tetris.block.Blocks;
 import tetris.block.TetrisBlock;
 import tetris.board.TetrisBoard;
 
@@ -16,7 +15,7 @@ public class BoardView {
     public static final String BACKGROUND_COLOUR = "#00033D";
 
     private static final int HEIGHT = 600;
-    private static final int BLOCK_SIZE = HEIGHT / TetrisBoard.getHeight();
+    public static final int BLOCK_SIZE = HEIGHT / TetrisBoard.getHeight();
     private static final int WIDTH = BLOCK_SIZE * TetrisBoard.getWidth();
 
     private BoardViewModel viewModel;
@@ -81,22 +80,35 @@ public class BoardView {
         }
     }
 
+    /**
+     * Draw the piece if it falls within the board.
+     *
+     * @param gc
+     * @param piece
+     */
     public static void drawPiece(GraphicsContext gc, TetrisBlock piece) {
         if (piece == null) {
             return;
         }
 
-        for (int i = piece.getxCoord(); i < piece.getxCoord() + Blocks.getLength(); i++) {
-            for (int j = piece.getyCoord(); j < piece.getyCoord() + Blocks.getLength(); j++) {
+        for (int i = 0; i < piece.getLength(); i++) {
+            for (int j = 0; j < piece.getLength(); j++) {
+
                 if (!piece.isEmpty(i, j)) {
-                    drawCell(gc, i, j, piece.getType().getColour());
+                    drawCell(gc, i + piece.getxCoord(), j + piece.getyCoord(),
+                            piece.getType().getColour());
                 }
+
             }
         }
 
     }
 
     private static void drawCell(GraphicsContext gc, int x, int y, String colour) {
+        if (x < 0 || x >= TetrisBoard.getWidth() || y < 0 || y >= TetrisBoard.getHeight()) {
+            return;
+        }
+
         int xCoord = x * BLOCK_SIZE;
         int yCoord = y * BLOCK_SIZE;
 
@@ -106,7 +118,4 @@ public class BoardView {
         gc.strokeRect(xCoord, yCoord, BLOCK_SIZE, BLOCK_SIZE);
     }
 
-    public static int getBlockSize() {
-        return BLOCK_SIZE;
-    }
 }

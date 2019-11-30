@@ -2,13 +2,12 @@ package tetris.block;
 
 import tetris.util.SquareMatrix;
 
-public abstract class Blocks {
-    private static final int LENGTH = 5;
+public abstract class Block {
     private SquareMatrix tile;
     private Tile type;
 
-    public Blocks(Tile type) {
-        tile = new SquareMatrix(LENGTH, type);
+    public Block(Tile type) {
+        tile = new SquareMatrix(type.getDimension(), type);
         this.type = type;
     }
 
@@ -20,7 +19,4 @@ public abstract class Blocks {
         return type;
     }
 
-    public static int getLength() {
-        return LENGTH;
-    }
 }

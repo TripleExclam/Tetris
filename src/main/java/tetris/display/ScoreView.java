@@ -11,13 +11,12 @@ import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.text.TextAlignment;
-import tetris.block.Blocks;
 
 public class ScoreView {
 
     private static final int SCORE_HEIGHT = 600;
     private static final int SCORE_WIDTH = 300;
-    private static final int PREVIEW_LENGTH = BoardView.getBlockSize() * (Blocks.getLength() + 1);
+    private static final int PREVIEW_LENGTH = BoardView.BLOCK_SIZE * (6);
 
     private ScoreViewModel viewModel;
     private VBox mainPane;
@@ -77,11 +76,37 @@ public class ScoreView {
         currentScore.textProperty()
                 .bindBidirectional(viewModel.getCurrentScoreProperty());
 
+
+        Label currentFitness = new Label("Score: ??");
+        currentFitness.setStyle("-fx-text-fill: white;");
+        currentFitness.setTextAlignment(TextAlignment.CENTER);
+        currentFitness.textProperty()
+                .bindBidirectional(viewModel.getCurrentFitnessProperty());
+
+        Label currentHeight = new Label("Average height: ??");
+        currentHeight.setStyle("-fx-text-fill: white;");
+        currentHeight.setTextAlignment(TextAlignment.CENTER);
+        currentHeight.textProperty()
+                .bindBidirectional(viewModel.getCurrentHeightProperty());
+
+        Label blocksPlaced = new Label("Blocks Placed: ??");
+        blocksPlaced.setStyle("-fx-text-fill: white;");
+        blocksPlaced.setTextAlignment(TextAlignment.CENTER);
+        blocksPlaced.textProperty()
+                .bindBidirectional(viewModel.getBlocksPlacedProperty());
+
+        Label holesCreated = new Label("Blocks Placed: ??");
+        holesCreated.setStyle("-fx-text-fill: white;");
+        holesCreated.setTextAlignment(TextAlignment.CENTER);
+        holesCreated.textProperty()
+                .bindBidirectional(viewModel.getHolesCreatedProperty());
+
         scoreList.setMaxHeight(150);
 
         VBox.setVgrow(scoreList, Priority.ALWAYS);
 
-        mainPane.getChildren().addAll(currentScoreTitle, currentScore);
+        mainPane.getChildren().addAll(currentScoreTitle,
+                currentScore, currentFitness, currentHeight, blocksPlaced, holesCreated);
         mainPane.getChildren().addAll(highScoresTitle, sortByBtn, scoreList);
         mainPane.getChildren().add(nextBlock);
     }

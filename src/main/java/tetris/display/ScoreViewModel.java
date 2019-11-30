@@ -11,8 +11,13 @@ import tetris.game.TetrisGame;
 
 public class ScoreViewModel {
     private TetrisGame game;
+    private StringProperty currentFitness;
     private StringProperty currentScore;
+    private StringProperty currentHeight;
     private StringProperty sortedAs;
+    private StringProperty blocksPlaced;
+    private StringProperty holesCreated;
+
     private ObservableList<String> scores;
 
     private boolean alphaSort;
@@ -20,6 +25,10 @@ public class ScoreViewModel {
     public ScoreViewModel(TetrisGame game) {
         this.game = game;
         currentScore = new SimpleStringProperty();
+        currentFitness = new SimpleStringProperty();
+        currentHeight =  new SimpleStringProperty();
+        blocksPlaced = new SimpleStringProperty();
+        holesCreated = new SimpleStringProperty();
         sortedAs = new SimpleStringProperty("Alphabetically");
         scores = FXCollections.observableArrayList(game.getScoreBoard().getAlphabeticalScores());
         alphaSort = true;
@@ -30,8 +39,28 @@ public class ScoreViewModel {
     }
 
 
+    public StringProperty getBlocksPlacedProperty() {
+        return blocksPlaced;
+    }
+
+    public StringProperty getCurrentFitnessProperty() {
+        return currentFitness;
+    }
+
+    public StringProperty getCurrentHeightProperty() {
+        return currentHeight;
+    }
+
+    public StringProperty getHolesCreatedProperty() {
+        return holesCreated;
+    }
+
     public void update() {
         currentScore.setValue("Score : " + game.getScoreBoard().getCurrentScore());
+        currentFitness.setValue("Fitness : " + game.getScoreBoard().getGradientHoles());
+        currentHeight.setValue("Average Height : " + game.getScoreBoard().getAvgHeight());
+        blocksPlaced.setValue("Blocks Placed : " + game.getScoreBoard().getBlocksPlaced());
+        holesCreated.setValue("Holes Created : " + game.getHolesCreated());
 
         scores.clear();
         scores.addAll((alphaSort) ? game.getScoreBoard().getAlphabeticalScores() :
@@ -62,4 +91,5 @@ public class ScoreViewModel {
     public void setPlayerScore(String name, int currentScore) {
         game.getScoreBoard().addScore(name, currentScore);
     }
+
 }

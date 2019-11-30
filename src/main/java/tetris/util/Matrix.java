@@ -1,6 +1,5 @@
 package tetris.util;
 
-import tetris.block.Blocks;
 import tetris.block.Tile;
 
 public class Matrix{
@@ -12,8 +11,15 @@ public class Matrix{
         mapTile(type);
     }
 
-    private void mapTile(Tile type) {
+    public Matrix copy() {
+        Matrix mat = new Matrix(getWidth(), getHeight(), Tile.EMP);
+        manipulate(((matrix1, x, y) -> {
+            set(y, x, this.get(y, x));
+        }));
+        return mat;
+    }
 
+    private void mapTile(Tile type) {
         int encoding = type.getEncoding();
 
         for (int i = getHeight(); i > 0; i--) {
@@ -24,29 +30,10 @@ public class Matrix{
         }
     }
 
-    public boolean checkIntersect(Matrix toAdd, int top, int left) {
-        int height = Math.min(top + toAdd.getHeight(), getHeight());
-        int width = Math.min(left + toAdd.getWidth(), getWidth());
-        int startHeight = Math.max(0, top);
-        int startWidth = Math.max(0, left);
-
-        for (int i = startHeight; i < height; i++) {
-            for (int j = startWidth; j < width; j++) {
-                if (!get(i, j).equals(Tile.EMP) &&
-                        !toAdd.get(i - top, j - left).equals(Tile.EMP)) {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-
-    public void setPiece(Matrix setPiece, int top, int left) {
-        for (int i = 0; i < Blocks.getLength(); i++) {
-            for (int j = 0; j < Blocks.getLength(); j++) {
-                if (!setPiece.get(i, j).equals(Tile.EMP)) {
-                    set(top + i, left + j, setPiece.get(i, j));
-                }
+    public void manipulate(MatrixOperation operation) {
+        for (int i = 0; i < getHeight(); i++) {
+            for (int j = 0; j < getWidth(); j++) {
+                operation.action(this, j, i);
             }
         }
     }
@@ -87,6 +74,10 @@ public class Matrix{
     }
 
     public void set(int row, int column, Tile value) {
+        if (row < 0 || row >= getHeight() || column < 0 || column >= getWidth()) {
+            return;
+        }
+
         matrix[row][column] = value;
     }
 
@@ -110,6 +101,21 @@ public class Matrix{
         }
 
         return matrix.toString();
+    }
+
+    public boolean isEmpty(int row) {
+
+        for (int j = 0; j < getWidth(); j++) {
+            if (!isEmptyCell(row, j)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public boolean isEmptyCell(int row, int col) {
+        return get(row, col).equals(Tile.EMP);
     }
 
     public static void main(String[] args) {

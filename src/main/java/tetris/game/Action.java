@@ -1,6 +1,7 @@
 package tetris.game;
 
 public enum Action {
+    NONE(null),
     UP(null),
     DOWN(UP),
     LEFT(null),

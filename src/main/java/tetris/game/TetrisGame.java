@@ -1,21 +1,20 @@
 package tetris.game;
 
-import tetris.block.TetrisBlock;
-import tetris.block.Tile;
 import tetris.board.TetrisBoard;
 import tetris.score.ScoreBoard;
-import tetris.util.Matrix;
 
 public class TetrisGame {
     private TetrisBoard board;
     private ScoreBoard scoreBoard;
 
-    private int scoreCutOff = 500;
+    private int holesCreated;
+
     private boolean gameOver;
     private boolean paused;
 
     public TetrisGame() {
         board = new TetrisBoard();
+        holesCreated = 0;
         scoreBoard = new ScoreBoard();
         gameOver = false;
         paused = false;
@@ -25,16 +24,26 @@ public class TetrisGame {
         if (paused || gameOver) {
             return;
         }
-        if (board.tickBlock(tick)) {
-            board.setPiece(new TetrisBlock(Tile.getRandom()));
+
+        int previousScore = scoreBoard.getCurrentScore();
+        int previousHoles = scoreBoard.calculateHoles(getBoard().getBoard());
+
+        if (board.tickBoard(tick)) {
+            board.setPiece();
             checkGameOver();
+            scoreBoard.calculateGradient(getBoard().getBoard());
+            scoreBoard.calculateHoles(getBoard().getBoard());
             scoreBoard.computeScore(board.clearLines());
+            holesCreated += scoreBoard.calculateHoles(getBoard().getBoard()) - previousHoles;
         }
 
-        if (scoreBoard.getCurrentScore() > scoreCutOff) {
-            scoreCutOff *= 2;
+        if (scoreBoard.getCurrentScore() > previousScore + 100) {
             board.increaseLevel();
         }
+    }
+
+    public int getHolesCreated() {
+        return holesCreated;
     }
 
     public ScoreBoard getScoreBoard() {
@@ -46,10 +55,10 @@ public class TetrisGame {
     }
 
     public void checkGameOver() {
-        Matrix board = getBoard().getBoard();
+        TetrisBoard board = getBoard();
 
-        for (int i = 0; i < board.getWidth(); i++) {
-            if (!board.get(0, i).equals(Tile.EMP)) {
+        for (int i = 0; i < TetrisBoard.getWidth(); i++) {
+            if (!board.getBoard().isEmpty(0)) {
                 gameOver = true;
             }
         }

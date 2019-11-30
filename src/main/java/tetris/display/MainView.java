@@ -14,15 +14,13 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class MainView {
-    private static int WINDOW_WIDTH = 900;
-    private static int WINDOW_HEIGHT = 750;
 
     private MainViewModel viewModel;
     private BoardView boardView;
     private ScoreView scoreView;
     private Stage root;
-
     private VBox rootGroup;
+
     // button press action queue
     private Queue<String> input;
 
@@ -92,6 +90,9 @@ public class MainView {
         HBox mainArea = new HBox();
         mainArea.setAlignment(Pos.CENTER);
 
+        int WINDOW_WIDTH = 900;
+        int WINDOW_HEIGHT = 750;
+
         mainArea.setMinWidth(WINDOW_WIDTH);
         mainArea.setMinHeight(WINDOW_HEIGHT);
 
@@ -127,10 +128,8 @@ public class MainView {
         new AnimationTimer() {
 
             public void handle(long currentNanoTime) {
-                while (!input.isEmpty()) {
-                    String key = input.remove();
-                    viewModel.getBoardVM().move(key);
-                }
+                String key = (input.isEmpty()) ? "NONE" : input.remove();
+                viewModel.getBoardVM().move(key);
                 viewModel.update();
                 boardView.redraw();
                 scoreView.redrawNextBlock();

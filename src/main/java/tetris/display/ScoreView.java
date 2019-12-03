@@ -77,7 +77,7 @@ public class ScoreView {
                 .bindBidirectional(viewModel.getCurrentScoreProperty());
 
 
-        Label currentFitness = new Label("Score: ??");
+        Label currentFitness = new Label("Gradient: ??");
         currentFitness.setStyle("-fx-text-fill: white;");
         currentFitness.setTextAlignment(TextAlignment.CENTER);
         currentFitness.textProperty()
@@ -95,7 +95,7 @@ public class ScoreView {
         blocksPlaced.textProperty()
                 .bindBidirectional(viewModel.getBlocksPlacedProperty());
 
-        Label holesCreated = new Label("Blocks Placed: ??");
+        Label holesCreated = new Label("Holes Created: ??");
         holesCreated.setStyle("-fx-text-fill: white;");
         holesCreated.setTextAlignment(TextAlignment.CENTER);
         holesCreated.textProperty()

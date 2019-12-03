@@ -13,21 +13,27 @@ public class ScoreBoard {
     private int holes;
     private int gradient;
     private int blocksPlaced;
+    private int previousScore;
     private double avgHeight;
+    private double previousHeight;
 
     private boolean tetris;
     private Map<String, Integer> scoreBoard;
 
     public ScoreBoard() {
         currentScore = 0;
+        previousScore = 0;
         holes = 0;
         gradient = 0;
         avgHeight = 0;
         blocksPlaced = 0;
+        previousHeight = 0;
         tetris = false;
         scoreBoard = new TreeMap<>();
-        addScore("Jesus", 60);
-        addScore("Steve", 120);
+    }
+
+    public ScoreBoard copy() {
+        return new ScoreBoard();
     }
 
     public int getGradientHoles() {
@@ -80,7 +86,9 @@ public class ScoreBoard {
             row = 0;
         }
         gradient = grad;
+        previousHeight = avgHeight;
         avgHeight += board.getHeight() - highest;
+
         return grad;
     }
 
@@ -89,6 +97,7 @@ public class ScoreBoard {
         if (linesCleared == 0) {
             return;
         }
+        previousScore = currentScore;
         currentScore += linesCleared * MULTIPLIER * LINE_CLEAR + ((tetris) ? 400 : 0);
         tetris = linesCleared == 4;
     }
@@ -97,8 +106,16 @@ public class ScoreBoard {
         return currentScore;
     }
 
+    public int getScoreChange() {
+        return currentScore - previousScore;
+    }
+
     public double getAvgHeight() {
         return avgHeight / blocksPlaced;
+    }
+
+    public double getHeightChange() {
+        return avgHeight - previousHeight;
     }
 
     public List<String> getAlphabeticalScores() {

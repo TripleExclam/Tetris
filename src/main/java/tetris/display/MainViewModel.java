@@ -4,7 +4,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
-import tetris.bot.NeuralTetris;
+import tetris.game.Player;
 import tetris.game.TetrisGame;
 
 public class MainViewModel {
@@ -24,7 +24,7 @@ public class MainViewModel {
         tick = 1;
     }
 
-    public MainViewModel(NeuralTetris bot) {
+    public MainViewModel(Player bot) {
         this();
         boardView = new BoardViewModel(game, bot);
     }
@@ -57,12 +57,11 @@ public class MainViewModel {
         return isPaused;
     }
 
-    public void restart() {
+    public void restart(Player bot) {
         game = new TetrisGame();
-        boardView = new BoardViewModel(game);
-        scoreView = new ScoreViewModel(game);
-        gameOver.setValue(false);
-        isPaused.setValue(false);
+        boardView.reset(game, bot);
+        scoreView.reset(game);
         update();
     }
+
 }

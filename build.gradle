@@ -16,7 +16,7 @@ repositories {
 
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile 'org.encog:encog-core:3.4'
+    compile 'org.encog:encog-core:3.2.0'
 }
 
 task(runExample, group: 'examples',

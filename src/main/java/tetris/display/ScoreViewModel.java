@@ -57,7 +57,7 @@ public class ScoreViewModel {
 
     public void update() {
         currentScore.setValue("Score : " + game.getScoreBoard().getCurrentScore());
-        currentFitness.setValue("Fitness : " + game.getScoreBoard().getGradientHoles());
+        currentFitness.setValue("Gradient : " + game.getScoreBoard().getGradientHoles());
         currentHeight.setValue("Average Height : " + game.getScoreBoard().getAvgHeight());
         blocksPlaced.setValue("Blocks Placed : " + game.getScoreBoard().getBlocksPlaced());
         holesCreated.setValue("Holes Created : " + game.getHolesCreated());
@@ -65,6 +65,11 @@ public class ScoreViewModel {
         scores.clear();
         scores.addAll((alphaSort) ? game.getScoreBoard().getAlphabeticalScores() :
                         game.getScoreBoard().getNumericalScores());
+    }
+
+    public void reset(TetrisGame game) {
+        this.game = game;
+        update();
     }
 
     public void switchScoreOrder() {

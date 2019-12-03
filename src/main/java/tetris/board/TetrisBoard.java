@@ -11,11 +11,11 @@ public class TetrisBoard {
     // Dimensional constants
     private static final int HEIGHT = 20;
     private static final int WIDTH = 12;
-    private static final int SPEED_INCREASE = 2;
+    private static final int SPEED_INCREASE = 1;
     private Random RANDOM;
 
     // Number of raw ticks before Board tick
-    private int speedValue = 50;
+    private int speedValue = 10;
 
     // The visible game space
     private Matrix board;
@@ -32,20 +32,26 @@ public class TetrisBoard {
      * Initialises a new board with randomly selected pieces.
      */
     public TetrisBoard() {
-        RANDOM = new Random(69);
+        RANDOM = new Random();
         board = new Matrix(WIDTH, HEIGHT, Tile.EMP);
         currentPiece = new TetrisBlock(Tile.getRandom(RANDOM));
         nextPiece = new TetrisBlock(Tile.getRandom(RANDOM));
         speed = false;
     }
 
-    public TetrisBoard(Matrix board) {
+    public TetrisBoard(Random rand) {
         this();
+        RANDOM = rand;
+    }
+
+    public TetrisBoard(Matrix board, TetrisBlock piece) {
+        this();
+        this.currentPiece = piece;
         this.board = board;
     }
 
     public TetrisBoard copy() {
-        return new TetrisBoard(board.copy());
+        return new TetrisBoard(board.copy(), currentPiece.copy());
     }
 
     /**
@@ -103,6 +109,10 @@ public class TetrisBoard {
             }
         }
 
+    }
+
+    public void clearBoard() {
+        board.manipulate(((matrix, x, y) -> board.set(y, x, Tile.EMP)));
     }
 
     /**

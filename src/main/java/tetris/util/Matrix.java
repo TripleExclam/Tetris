@@ -13,9 +13,7 @@ public class Matrix{
 
     public Matrix copy() {
         Matrix mat = new Matrix(getWidth(), getHeight(), Tile.EMP);
-        manipulate(((matrix1, x, y) -> {
-            set(y, x, this.get(y, x));
-        }));
+        mat.manipulate(((matrix, x, y) -> matrix.set(y, x, this.get(y, x))));
         return mat;
     }
 

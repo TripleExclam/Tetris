@@ -2,40 +2,52 @@ package tetris.bot;
 
 import org.encog.ml.data.MLData;
 import org.encog.ml.data.basic.BasicMLData;
-import org.encog.neural.networks.BasicNetwork;
+import org.encog.neural.neat.NEATNetwork;
 import org.encog.util.arrayutil.NormalizationAction;
 import org.encog.util.arrayutil.NormalizedField;
 import tetris.block.Tile;
 import tetris.board.TetrisBoard;
 import tetris.game.Action;
+import tetris.game.Player;
 import tetris.game.TetrisGame;
 
 
-public class NeuralTetris {
-    private BasicNetwork network;
+public class NeuralTetris implements Player {
+    private NEATNetwork network;
 
     private NormalizedField boardStats;
     private NormalizedField score;
 
-    public NeuralTetris(BasicNetwork network, boolean track) {
-        boardStats = new NormalizedField(NormalizationAction.Normalize, "tile",
-                Tile.values().length - 1, 0, -0.9, 0.9);
-        score = new NormalizedField(NormalizationAction.Normalize, "score",
-                1000, -100, 0.9, -0.9);
+    private int goodMoves;
 
+    public NeuralTetris(NEATNetwork network) {
+        boardStats = new NormalizedField(NormalizationAction.Normalize, "tile",
+                Tile.values().length - 1, 0, 0.9, -0.9);
+        score = new NormalizedField(NormalizationAction.Normalize, "score",
+                2000, -2000, 0.9, -0.9);
         this.network = network;
+        goodMoves = 0;
     }
 
-    public void getMove(TetrisGame game) {
+    public void makeMove(TetrisGame game) {
+        game.getBoard().move(Action.DOWN);
+        if (game.getHolesCreated() == 0) {
+            goodMoves += (game.getScoreBoard().getScoreChange() > 0) ? 5 : 1;
+        }
+
+        if (game.getScoreBoard().getAvgHeight() > 8) {
+            game.endGame();
+        }
 
         MLData input = new BasicMLData(TetrisBoard.getHeight() * TetrisBoard.getWidth());
 
         TetrisBoard board = game.getBoard().copy();
         board.lockPiece(game.getBoard().getPiece());;
 
+        int index = 0;
         for (int i = 0; i < TetrisBoard.getHeight(); i++) {
             for (int j = 0; j < TetrisBoard.getWidth(); j++) {
-                input.setData(i * TetrisBoard.getWidth() + j,
+                input.setData(index++,
                         this.boardStats.normalize(board.getBoard().get(i, j).ordinal()));
             }
         }
@@ -51,48 +63,20 @@ public class NeuralTetris {
             }
         }
 
-        switch (max) {
-            case 0:
-                game.getBoard().move(Action.RIGHT);
-                break;
-            case 1:
-                game.getBoard().move(Action.LEFT);
-                break;
-            case 2:
-                game.getBoard().move(Action.ROTATE_LEFT);
-                break;
-            case 3:
-                game.getBoard().move(Action.ROTATE_RIGHT);
-                break;
-        }
-
-        game.getBoard().move(Action.DOWN);
+        Action[] moves = {Action.NONE, Action.NONE, Action.RIGHT,
+                Action.LEFT, Action.NONE};
+        game.getBoard().move(moves[max]);
     }
 
     public double scorePilot() {
         TetrisGame sim = new TetrisGame();
         int tick = 1;
-        double score = 0;
 
-        while(!sim.isGameOver()) {
-            if (tick % 2 == 0) {
-                getMove(sim);
-            }
+        while(!sim.isGameOver() && tick < (Integer.MAX_VALUE >> 1)) {
+            makeMove(sim);
             sim.tick(tick++);
-
-            if (sim.getHolesCreated() > 4) {
-                break;
-            }
-        }
-        if (sim.getScoreBoard().getCurrentScore() > 0) {
-            System.out.println("BLOCKS PLACED: " + sim.getScoreBoard().getBlocksPlaced());
-            System.out.println("AVG HEIGHT:" + sim.getScoreBoard().getAvgHeight());
-            System.out.println("SCORE:" + this.score.normalize(score));
         }
 
-        return this.score.normalize(sim.getScoreBoard().getBlocksPlaced() - 1
-                - sim.getScoreBoard().getGradientHoles()
-                + sim.getScoreBoard().getCurrentScore()
-                - sim.getHolesCreated());
+        return this.score.normalize(goodMoves);
     }
 }

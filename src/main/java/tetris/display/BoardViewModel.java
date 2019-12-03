@@ -1,20 +1,22 @@
 package tetris.display;
 
 import tetris.board.TetrisBoard;
-import tetris.bot.NeuralTetris;
 import tetris.game.Action;
+import tetris.game.Player;
 import tetris.game.TetrisGame;
 
 public class BoardViewModel {
 
     private TetrisGame game;
-    private NeuralTetris bot = null;
+    private Player bot = null;
+    private int blocksPlaced = 0;
 
     public BoardViewModel(TetrisGame game) {
         this.game = game;
+        blocksPlaced = game.getScoreBoard().getBlocksPlaced();
     }
 
-    public BoardViewModel(TetrisGame game, NeuralTetris bot) {
+    public BoardViewModel(TetrisGame game, Player bot) {
         this(game);
         this.bot = bot;
     }
@@ -23,13 +25,21 @@ public class BoardViewModel {
         return game.getBoard();
     }
 
+    public void reset(TetrisGame game, Player bot) {
+        this.game = game;
+        this.bot = bot;
+        getBoard().clearBoard();
+    }
 
     public void move(String action) {
-        if (bot != null) {
-            bot.getMove(game);
+        if (bot != null && blocksPlaced < game.getScoreBoard().getBlocksPlaced()) {
+            blocksPlaced = game.getScoreBoard().getBlocksPlaced();
+            bot.makeMove(game);
             return;
         }
+
         TetrisBoard board = game.getBoard();
+
         switch(action.toUpperCase()) {
             case "NONE":
                 return;

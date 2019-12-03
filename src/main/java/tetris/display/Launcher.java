@@ -2,13 +2,17 @@ package tetris.display;
 
 import javafx.application.Application;
 import javafx.stage.Stage;
-import org.encog.neural.networks.BasicNetwork;
-import tetris.bot.NeuralTetris;
+import tetris.workingAI.BestMoveCalculator;
 
 
-public class Launcher extends Application {
+public class Launcher extends Application implements Runnable {
 
-    private static NeuralTetris bot = null;
+    private static MainViewModel viewModel = null;
+
+    @Override
+    public void run() {
+        main(new String[] {});
+    }
 
     public static void main(String[] args) {
         launch(args);
@@ -17,18 +21,16 @@ public class Launcher extends Application {
     @Override
     public void start(Stage primaryStage) {
         primaryStage.setResizable(false);
-        var params = getParameters().getRaw();
-        if (bot != null) {
-            var view = new MainView(primaryStage, new MainViewModel(bot));
-            view.run();
+        MainView view;
+        if (viewModel != null) {
+            view = new MainView(primaryStage, viewModel);
         } else {
-            var view = new MainView(primaryStage, new MainViewModel());
-            view.run();
+            view = new MainView(primaryStage, new MainViewModel(new BestMoveCalculator()));
         }
+        view.run();
     }
 
-    public static void launchNeural(BasicNetwork network) {
-        bot = new NeuralTetris(network, false);
-        main(new String[] {});
+    public static void launchNeural(MainViewModel view) {
+        viewModel = view;
     }
 }

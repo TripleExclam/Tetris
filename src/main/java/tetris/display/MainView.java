@@ -1,6 +1,5 @@
 package tetris.display;
 
-import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -9,6 +8,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
+import tetris.util.FastAnimationTimer;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -54,27 +54,26 @@ public class MainView {
             }
         });
 
-        viewModel.isGameOver().addListener(event -> {
-            TextInputDialog dialog = new TextInputDialog("");
-            dialog.setTitle("Game Over");
-            dialog.setContentText("Please enter your name:");
-            dialog.setHeaderText(null);
-            dialog.setGraphic(null);
 
-            dialog.show();
+        viewModel.isGameOver().addListener((observable, oldValue, newValue) -> {
+            if (oldValue) {
+                return;
+            }
+            TextInputDialog dialog = new TextInputDialog("");
             dialog.setOnHidden(closeEvent -> {
+                viewModel.restart(null);
                 String name = dialog.getEditor().getText();
 
                 if (name != null && !name.isEmpty()) {
                     viewModel.getScoreVM().setPlayerScore(name,
                             viewModel.getScoreVM().getCurrentScore());
                 }
-                viewModel.restart();
             });
-
-            dialog.setOnCloseRequest(closeEvent -> {
-                viewModel.restart();
-            });
+            dialog.setTitle("Game Over");
+            dialog.setContentText("Please enter your name:");
+            dialog.setHeaderText(null);
+            dialog.setGraphic(null);
+            dialog.show();
         });
 
         boardView = new BoardView(viewModel.getBoardVM());
@@ -89,12 +88,6 @@ public class MainView {
     private void createWindow() {
         HBox mainArea = new HBox();
         mainArea.setAlignment(Pos.CENTER);
-
-        int WINDOW_WIDTH = 900;
-        int WINDOW_HEIGHT = 750;
-
-        mainArea.setMinWidth(WINDOW_WIDTH);
-        mainArea.setMinHeight(WINDOW_HEIGHT);
 
         Label mapTitle = new Label();
         mapTitle.setTextAlignment(TextAlignment.CENTER);
@@ -125,15 +118,17 @@ public class MainView {
      * @given
      */
     public void run() {
-        new AnimationTimer() {
+        new FastAnimationTimer(0) {
 
-            public void handle(long currentNanoTime) {
+            @Override
+            public void handle() {
                 String key = (input.isEmpty()) ? "NONE" : input.remove();
                 viewModel.getBoardVM().move(key);
                 viewModel.update();
                 boardView.redraw();
                 scoreView.redrawNextBlock();
             }
+
         }.start();
 
         // Show the game screen

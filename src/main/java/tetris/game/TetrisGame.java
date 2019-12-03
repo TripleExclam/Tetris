@@ -3,6 +3,8 @@ package tetris.game;
 import tetris.board.TetrisBoard;
 import tetris.score.ScoreBoard;
 
+import java.util.Random;
+
 public class TetrisGame {
     private TetrisBoard board;
     private ScoreBoard scoreBoard;
@@ -18,6 +20,18 @@ public class TetrisGame {
         scoreBoard = new ScoreBoard();
         gameOver = false;
         paused = false;
+    }
+
+    public TetrisGame(int seed) {
+        this();
+        board = new TetrisBoard(new Random(seed));
+    }
+
+    public TetrisGame copy() {
+        TetrisGame game = new TetrisGame();
+        game.setBoard(getBoard().copy());
+        game.setScoreBoard(getScoreBoard().copy());
+        return game;
     }
 
     public void tick(int tick) {
@@ -68,7 +82,19 @@ public class TetrisGame {
         return gameOver;
     }
 
+    public void endGame() {
+        gameOver = true;
+    }
+
     public void togglePause() {
         paused = !paused;
+    }
+
+    public void setBoard(TetrisBoard board) {
+        this.board = board;
+    }
+
+    public void setScoreBoard(ScoreBoard scoreBoard) {
+        this.scoreBoard = scoreBoard;
     }
 }
